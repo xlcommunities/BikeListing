@@ -1,6 +1,6 @@
 import { Environment } from '@abp/ng.core';
 
-const baseUrl = 'https://bike-listing.vercel.app/';
+const baseUrl = 'https://bike-listing.vercel.app';
 
 const oAuthConfig = {
   issuer: 'https://bikelistingapi.azurewebsites.net/',
