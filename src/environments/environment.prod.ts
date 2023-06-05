@@ -1,6 +1,6 @@
 import { Environment } from '@abp/ng.core';
 
-const baseUrl = 'https://nice-meadow-087da570f.3.azurestaticapps.net';
+const baseUrl = 'https://gentle-ocean-025f9b50f.3.azurestaticapps.net';
 
 const oAuthConfig = {
   issuer: 'https://bikelistingapi.azurewebsites.net/',
