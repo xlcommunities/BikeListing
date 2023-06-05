@@ -1,0 +1,273 @@
+<abp-page [title]="'::Bikes' | abpLocalization">
+  <abp-page-toolbar-container class="col">
+    <div class="text-lg-end pt-2">
+      <button
+        class="btn btn-primary btn-sm mx-2"
+        type="button"
+        [disabled]="isExportToExcelBusy"
+        (click)="exportToExcel()"
+      >
+        {{ '::ExportToExcel' | abpLocalization }}
+      </button>
+
+      <button
+        *abpPermission="'BikeListing.Bikes.Create'"
+        class="btn btn-primary btn-sm"
+        type="button"
+        (click)="create()"
+      >
+        <i class="fa fa-plus me-1" aria-hidden="true"></i>
+        {{ '::NewBike' | abpLocalization }}
+      </button>
+    </div>
+  </abp-page-toolbar-container>
+
+  <abp-advanced-entity-filters localizationSourceName="" [list]="list">
+    <abp-advanced-entity-filters-form>
+      <form #filterForm (keyup.enter)="list.get()">
+        <div class="row">
+          <div class="col-12 col-sm-auto">
+            <div class="mb-3">
+              <label class="form-label" for="modelFilter">
+                {{ '::Model' | abpLocalization }}
+              </label>
+
+              <input
+                id="modelFilter"
+                class="form-control"
+                [(ngModel)]="filters.model"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+          <div class="col-12 col-sm-auto">
+            <div class="mb-3">
+              <label class="form-label" for="minFrameSize">
+                {{ '::MinFrameSize' | abpLocalization }}
+              </label>
+
+              <input
+                id="minFrameSize"
+                type="number"
+                class="form-control"
+                [(ngModel)]="filters.frameSizeMin"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-auto">
+            <div class="mb-3">
+              <label class="form-label" for="maxFrameSize">
+                {{ '::MaxFrameSize' | abpLocalization }}
+              </label>
+
+              <input
+                id="maxFrameSize"
+                type="number"
+                class="form-control"
+                [(ngModel)]="filters.frameSizeMax"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+          <div class="col-12 col-sm-auto">
+            <div class="mb-3">
+              <label class="form-label" for="minPrice">
+                {{ '::MinPrice' | abpLocalization }}
+              </label>
+
+              <input
+                id="minPrice"
+                type="number"
+                class="form-control"
+                [(ngModel)]="filters.priceMin"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-auto">
+            <div class="mb-3">
+              <label class="form-label" for="maxPrice">
+                {{ '::MaxPrice' | abpLocalization }}
+              </label>
+
+              <input
+                id="maxPrice"
+                type="number"
+                class="form-control"
+                [(ngModel)]="filters.priceMax"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+          <div class="col-12 col-sm-auto">
+            <div class="mb-3">
+              <label class="form-label" for="manufacturerIdFilter">
+                {{ '::Manufacturer' | abpLocalization }}
+              </label>
+              <abp-lookup-select
+                cid="manufacturerIdFilter"
+                [getFn]="service.getManufacturerLookup"
+                [(ngModel)]="filters.manufacturerId"
+                [ngModelOptions]="{ standalone: true }"
+              ></abp-lookup-select>
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-auto align-self-end mb-3">
+            <div class="row">
+              <div class="col-6 col-sm-auto d-grid">
+                <button type="button" class="btn btn-outline-primary" (click)="clearFilters()">
+                  <span>{{ 'AbpUi::Clear' | abpLocalization }}</span>
+                </button>
+              </div>
+              <div class="col-6 col-sm-auto d-grid">
+                <button type="button" class="btn btn-primary" (click)="list.get()">
+                  <span>{{ 'AbpUi::Refresh' | abpLocalization }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </abp-advanced-entity-filters-form>
+  </abp-advanced-entity-filters>
+
+  <div class="card">
+    <div class="card-body">
+      <ngx-datatable [rows]="data.items" [count]="data.totalCount" [list]="list" default>
+        <ngx-datatable-column
+          [name]="'AbpUi::Actions' | abpLocalization"
+          [maxWidth]="150"
+          [width]="150"
+          [sortable]="false"
+        >
+          <ng-template let-row="row" let-i="rowIndex" ngx-datatable-cell-template>
+            <div ngbDropdown container="body" class="d-inline-block">
+              <button
+                class="btn btn-primary btn-sm dropdown-toggle"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                ngbDropdownToggle
+              >
+                <i class="fa fa-cog me-1" aria-hidden="true"></i>
+                {{ 'AbpUi::Actions' | abpLocalization }}
+              </button>
+
+              <div ngbDropdownMenu>
+                <button
+                  ngbDropdownItem
+                  *abpPermission="'BikeListing.Bikes.Edit'"
+                  (click)="update(row)"
+                >
+                  {{ 'AbpUi::Edit' | abpLocalization }}
+                </button>
+
+                <button
+                  ngbDropdownItem
+                  *abpPermission="'BikeListing.Bikes.Delete'"
+                  (click)="delete(row)"
+                >
+                  {{ 'AbpUi::Delete' | abpLocalization }}
+                </button>
+              </div>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="{{ '::Model' | abpLocalization }}" prop="bike.model">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{ row.bike.model }}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="{{ '::FrameSize' | abpLocalization }}" prop="bike.frameSize">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{ row.bike.frameSize }}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="{{ '::Price' | abpLocalization }}" prop="bike.price">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{ row.bike.price }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+          name="{{ '::Manufacturer' | abpLocalization }}"
+          prop="manufacturer.name"
+        >
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{ row.manufacturer?.name }}
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+</abp-page>
+
+<abp-modal [busy]="isModalBusy" [(visible)]="isModalOpen">
+  <ng-template #abpHeader>
+    <h3>
+      {{ (selected ? 'AbpUi::Edit' : '::NewBike') | abpLocalization }}
+    </h3>
+  </ng-template>
+
+  <ng-template #abpBody>
+    <form [formGroup]="form" id="bike" (ngSubmit)="submitForm()" validateOnSubmit>
+      <div class="mt-2 fade-in-top">
+        <div class="mb-3">
+          <label class="form-label" for="bike-model"> {{ '::Model' | abpLocalization }} * </label>
+
+          <input
+            id="bike-model"
+            formControlName="model"
+            class="form-control"
+            maxlength="100"
+            minlength="1"
+            autofocus
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="bike-frame-size">
+            {{ '::FrameSize' | abpLocalization }}
+          </label>
+
+          <input
+            type="number"
+            id="bike-frame-size"
+            formControlName="frameSize"
+            class="form-control"
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="bike-price">
+            {{ '::Price' | abpLocalization }}
+          </label>
+
+          <input type="number" id="bike-price" formControlName="price" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="bike-manufacturer-id">
+            {{ '::Manufacturer' | abpLocalization }} *
+          </label>
+
+          <abp-lookup-select
+            cid="bike-manufacturer-id"
+            formControlName="manufacturerId"
+            [getFn]="service.getManufacturerLookup"
+          ></abp-lookup-select>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #abpFooter>
+    <button type="button" class="btn btn-secondary" abpClose>
+      {{ 'AbpUi::Cancel' | abpLocalization }}
+    </button>
+
+    <abp-button iconClass="fa fa-check" buttonType="submit" formName="bike">
+      {{ 'AbpUi::Save' | abpLocalization }}
+    </abp-button>
+  </ng-template>
+</abp-modal>

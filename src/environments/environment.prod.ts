@@ -1,0 +1,35 @@
+import { Environment } from '@abp/ng.core';
+
+const baseUrl = 'https://nice-meadow-087da570f.3.azurestaticapps.net';
+
+const oAuthConfig = {
+  issuer: 'https://bikelistingapi.azurewebsites.net/',
+  redirectUri: baseUrl,
+  clientId: 'BikeListing_App',
+  responseType: 'code',
+  scope: 'offline_access BikeListing',
+  requireHttps: true,
+};
+
+export const environment = {
+  production: true,
+  application: {
+    baseUrl,
+    name: 'BikeListing',
+  },
+  oAuthConfig,
+  apis: {
+    default: {
+      url: 'https://bikelistingapi.azurewebsites.net',
+      rootNamespace: 'BikeListing',
+    },
+    AbpAccountPublic: {
+      url: oAuthConfig.issuer,
+      rootNamespace: 'AbpAccountPublic',
+    },
+  },
+  remoteEnv: {
+    url: '/getEnvConfig',
+    mergeStrategy: 'deepmerge'
+  }
+} as Environment;
